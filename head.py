@@ -4,7 +4,6 @@ import numpy         as np
 from theano_toolkit import utils as U
 
 def build(P,id,input_size,mem_width,mem_size,shift_width):
-
 	P["W_%d_key"%id]   = U.initial_weights(input_size,mem_width)
 	P["b_%d_key"%id]   = 0. * U.initial_weights(mem_width)
 	P["W_%d_shift"%id] = U.initial_weights(input_size,shift_width)
@@ -22,7 +21,7 @@ def build(P,id,input_size,mem_width,mem_size,shift_width):
 	P["W_%d_add"%id]   = U.initial_weights(input_size,mem_width)
 	P["b_%d_add"%id]   = 0. * U.initial_weights(mem_width)
 
-	
+
 	def head_params(x):
 		# key
 		key_t = T.dot(x,P["W_%d_key"%id]) + P["b_%d_key"%id]
@@ -42,8 +41,6 @@ def build(P,id,input_size,mem_width,mem_size,shift_width):
 #		beta_t  = T.exp(_beta_t)
 #		gamma_t = T.exp(_gamma_t) + 1.
 
-
-
 		g_t     = T.nnet.sigmoid(T.dot(x,P["W_%d_g"%id]) + P["b_%d_g"%id])
 
 		erase_t = T.nnet.sigmoid(T.dot(x,P["W_%d_erase"%id]) + P["b_%d_erase"%id])
@@ -51,4 +48,3 @@ def build(P,id,input_size,mem_width,mem_size,shift_width):
 
 		return key_t,beta_t,g_t,shift_t,gamma_t,erase_t,add_t
 	return head_params
-

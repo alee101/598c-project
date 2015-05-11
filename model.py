@@ -9,29 +9,29 @@ import head
 import scipy
 
 def cosine_sim(k,M):
-
 	k_unit = k / ( T.sqrt(T.sum(k**2)) + 1e-5 )
-	k_unit = k_unit.dimshuffle(('x',0)) #T.patternbroadcast(k_unit.reshape((1,k_unit.shape[0])),(True,False))
+	k_unit = k_unit.dimshuffle(('x',0))
 	k_unit.name = "k_unit"
 	M_lengths = T.sqrt(T.sum(M**2,axis=1)).dimshuffle((0,'x'))
 	M_unit = M / ( M_lengths + 1e-5 )
-	
+
 	M_unit.name = "M_unit"
-#	M_unit = Print("M_unit")(M_unit)
+
 	return T.sum(k_unit * M_unit,axis=1)
 
-def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine_sim,shift_width=3,no_heads=1):
-	
+def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine_sim,shift_width=3):
 	shift_conv = scipy.linalg.circulant(np.arange(mem_size)).T[np.arange(-(shift_width//2),(shift_width//2)+1)][::-1]
 
+        # Initial N X M memory: M_0
 	P.memory_init = 2 * (np.random.rand(mem_size,mem_width) - 0.5)
-	P.weight_init = np.random.randn(mem_size)
-
 	memory_init = P.memory_init
+
+        # Initial N-dim weight vector: w_0
+	P.weight_init = np.random.randn(mem_size)
 	weight_init = U.vector_softmax(P.weight_init)
 
-	heads = [head.build(P,h,controller_size,mem_width,mem_size,shift_width) for h in range(no_heads)]
-	
+        heads = head.build(P,h,controller_size,mem_width,mem_size,shift_width)
+
 	def build_memory_curr(M_prev,erase_head,add_head,weight):
 		weight = weight.dimshuffle((0,'x'))
 
@@ -41,7 +41,7 @@ def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine
 		M_erased = M_prev   * (1 - (weight * erase_head))
 		M_curr   = M_erased +      (weight * add_head)
 		return M_curr
-	
+
 	def build_read(M_curr,weight_curr):
 		return T.dot(weight_curr, M_curr)
 
@@ -54,6 +54,8 @@ def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine
 		"""
 		This function is best described by Figure 2 in the paper.
 		"""
+                # input_curr is final hidden layer from controller
+                # this is passing the hidden layer into head_params of head.py
 		key,beta,g,shift,gamma,erase,add = head(input_curr)
 
 		# 3.3.1 Focusing b Content
@@ -70,21 +72,18 @@ def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine
 		weight_curr    = weight_sharp / T.sum(weight_sharp)
 
 		return weight_curr,erase,add
-	
+
 	def step(input_curr,M_prev,weight_prev):
-		#print read_prev.type
-		
 		read_prev = build_read(M_prev,weight_prev)
 		output,controller_hidden = controller(input_curr,read_prev)
 
 		weight_inter,M_inter = weight_prev,M_prev
-		for head in heads:
-			weight_inter,erase,add = build_head_curr(weight_inter,M_inter,head,controller_hidden)
-			M_inter = build_memory_curr(M_inter,erase,add,weight_inter)
+
+                weight_inter,erase,add = build_head_curr(weight_inter,M_inter,heads,controller_hidden)
+                M_inter = build_memory_curr(M_inter,erase,add,weight_inter)
+
 		weight_curr,M_curr = weight_inter,M_inter
-		
-		#print [i.type for i in [erase_curr,add_curr,key_curr,shift_curr,beta_curr,gamma_curr,g_curr,output]]
-		#print weight_curr.type
+
 		return M_curr,weight_curr,output
 	return step,[memory_init,weight_init,None]
 
@@ -92,11 +91,10 @@ def build(P,mem_size,mem_width,controller_size,ctrl):
 	step,outputs_info = build_step(P,ctrl,controller_size,mem_size,mem_width)
 	def predict(input_sequence):
 		outputs,_ = theano.scan(
-				step,
+				step, # apply step to input_sequence
 				sequences    = [input_sequence],
 				outputs_info = outputs_info
 			)
+                # output is current memory, weight, and output (from step)
 		return outputs
 	return predict
-
-
