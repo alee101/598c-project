@@ -56,7 +56,7 @@ def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine
 		"""
                 # input_curr is final hidden layer from controller
                 # this is passing the hidden layer into head_params of head.py
-		key,beta,g,shift,gamma,erase,add = head(input_curr)
+		key,beta,g,shift,erase,add = head(input_curr)
 
 		# 3.3.1 Focusing b Content
 		weight_c = U.vector_softmax(beta * similarity(key,M_curr))
@@ -67,9 +67,7 @@ def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine
 		weight_g.name = "weight_g"
 
 		weight_shifted = shift_convolve(weight_g,shift)
-
-		weight_sharp   = weight_shifted ** gamma
-		weight_curr    = weight_sharp / T.sum(weight_sharp)
+                weight_curr    = weight_shifted / T.sum(weight_shifted)
 
 		return weight_curr,erase,add
 

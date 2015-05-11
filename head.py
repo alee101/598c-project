@@ -11,8 +11,6 @@ def build(P,input_size,mem_width,mem_size,shift_width):
 
 	P["W_%d_beta"]  = 0. * U.initial_weights(input_size)
 	P["b_%d_beta"]  = 0.
-	P["W_%d_gamma"] = U.initial_weights(input_size)
-	P["b_%d_gamma"] = 0.
 	P["W_%d_g"]     = U.initial_weights(input_size)
 	P["b_%d_g"]     = 0.
 
@@ -32,19 +30,14 @@ def build(P,input_size,mem_width,mem_size,shift_width):
 
 		# scalars
 		_beta_t  = T.dot(x,P["W_%d_beta"])  + P["b_%d_beta"]
-		_gamma_t = T.dot(x,P["W_%d_gamma"]) + P["b_%d_gamma"]
-
 		beta_t  = T.nnet.softplus(_beta_t)
-		gamma_t = T.nnet.softplus(_gamma_t) + 1.
 #		beta_t  = (_beta_t  > 0)*_beta_t
-#		gamma_t = (_gamma_t > 0)*_gamma_t + 1.
 #		beta_t  = T.exp(_beta_t)
-#		gamma_t = T.exp(_gamma_t) + 1.
 
 		g_t     = T.nnet.sigmoid(T.dot(x,P["W_%d_g"]) + P["b_%d_g"])
 
 		erase_t = T.nnet.sigmoid(T.dot(x,P["W_%d_erase"]) + P["b_%d_erase"])
 		add_t   = T.dot(x,P["W_%d_add"]) + P["b_%d_add"]
 
-		return key_t,beta_t,g_t,shift_t,gamma_t,erase_t,add_t
+		return key_t,beta_t,g_t,shift_t,,erase_t,add_t
 	return head_params
