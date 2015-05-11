@@ -48,7 +48,7 @@ if __name__ == "__main__":
 		output_size = 8
 	)
 
-	max_sequences = 100000
+	max_sequences = 50000
 	patience = 20000
 	patience_increase = 3
 	improvement_threshold = 0.995
@@ -59,7 +59,7 @@ if __name__ == "__main__":
 	for counter in xrange(max_sequences):
                 # Start training with short sequences, gradually increase max length
                 # as training progresses
-		length = np.random.randint(int(20 * (min(counter,50000)/float(50000))**2) +1) + 1
+		length = np.random.randint(int(20 * (min(counter,25000)/float(25000))**2) +1) + 1
 		i,o = tasks.copy(8,length)
 		if score == None: score = train(i,o)
 		else: score = alpha * score + (1 - alpha) * train(i,o)
