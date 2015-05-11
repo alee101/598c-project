@@ -56,10 +56,10 @@ def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine
 		"""
                 # input_curr is final hidden layer from controller
                 # this is passing the hidden layer into head_params of head.py
-		key,beta,g,shift,gamma,erase,add = head(input_curr)
+		g,shift,gamma,erase,add = head(input_curr)
 
-		# 3.3.1 Focusing b Content
-		weight_c = U.vector_softmax(beta * similarity(key,M_curr))
+                weight_c = np.zeros((mem_width,))
+                weight_c[0] = 1
 		weight_c.name = "weight_c"
 
 		# 3.3.2 Focusing by Location
