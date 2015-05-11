@@ -30,7 +30,7 @@ def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine
 	P.weight_init = np.random.randn(mem_size)
 	weight_init = U.vector_softmax(P.weight_init)
 
-        heads = head.build(P,h,controller_size,mem_width,mem_size,shift_width)
+        heads = head.build(P,controller_size,mem_width,mem_size,shift_width)
 
 	def build_memory_curr(M_prev,erase_head,add_head,weight):
 		weight = weight.dimshuffle((0,'x'))
