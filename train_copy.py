@@ -11,10 +11,10 @@ import tasks
 import sys
 np.random.seed(1234)
 
-def make_train(input_size,output_size,mem_size,mem_width,hidden_sizes=100):
+def make_train(input_size,output_size,mem_size,mem_width,hidden_size=100):
 	P = Parameters()
-	ctrl = controller.build(P,input_size,output_size,mem_size,mem_width,hidden_sizes)
-	predict = model.build(P,mem_size,mem_width,hidden_sizes,ctrl)
+	ctrl = controller.build(P,input_size,output_size,mem_size,mem_width,hidden_size)
+	predict = model.build(P,mem_size,mem_width,hidden_size,ctrl)
 
 	input_seq = T.matrix('input_sequence')
 	output_seq = T.matrix('output_sequence')
