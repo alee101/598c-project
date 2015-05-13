@@ -39,5 +39,5 @@ def build(P,input_size,mem_width,mem_size,shift_width):
 		erase_t = T.nnet.sigmoid(T.dot(x,P["W_%d_erase"]) + P["b_%d_erase"])
 		add_t   = T.dot(x,P["W_%d_add"]) + P["b_%d_add"]
 
-		return key_t,beta_t,g_t,shift_t,,erase_t,add_t
+		return key_t,beta_t,g_t,shift_t,erase_t,add_t
 	return head_params
