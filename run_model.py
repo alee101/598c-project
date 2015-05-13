@@ -16,10 +16,10 @@ def make_model(
 		output_size=8,
 		mem_size=128,
 		mem_width=20,
-		hidden_sizes=100):
+		hidden_size=100):
 	P = Parameters()
-	ctrl = controller.build(P,input_size,output_size,mem_size,mem_width,hidden_sizes)
-	predict = model.build(P,mem_size,mem_width,hidden_sizes,ctrl)
+	ctrl = controller.build(P,input_size,output_size,mem_size,mem_width,hidden_size)
+	predict = model.build(P,mem_size,mem_width,hidden_size,ctrl)
 	input_seq = T.matrix('input_sequence')
 	[M_curr,weights,output] = predict(input_seq)
 
@@ -28,5 +28,3 @@ def make_model(
 			outputs=[weights,output]
 		)
 	return P,test_fun
-
-
