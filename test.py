@@ -42,10 +42,10 @@ if __name__ == "__main__":
     P.load(sys.argv[1])
     
     # Randomly generate a copy task and perform the task
-    input_data, expected_output = tasks.copy(8,seq_length)
+    input_data, expected_output = tasks.copy(8, int(sys.argv[2]))
     weights, actual_output = do_task(input_data)
 
     # Plot the outputs and compute the error_rate
-    plot(int(sys.argv[2]))
+    plot(input_data, expected_output, actual_output)
     print "The average error rate was " + str(error_rate(expected_output, actual_output))
 
