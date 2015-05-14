@@ -14,11 +14,11 @@ def plot(input_data, expected_output, actual_output):
     """
     plt.figure(1,figsize=(20,7))
     plt.subplot(311)
-    plt.imshow(i.T,interpolation='nearest')
+    plt.imshow(input_data.T,interpolation='nearest')
     plt.subplot(312)
-    plt.imshow(o.T,interpolation='nearest')
+    plt.imshow(expected_output.T,interpolation='nearest')
     plt.subplot(313)
-    plt.imshow(outputs.T,interpolation='nearest')
+    plt.imshow(actual_output.T,interpolation='nearest')
     plt.show()
 
 
