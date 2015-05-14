@@ -4,6 +4,12 @@ import numpy         as np
 from theano_toolkit import utils as U
 
 def build(P,input_size,mem_width,mem_size,shift_width):
+        """
+        NTM heads are implemented as another hidden layer coming after
+        the last hidden layer of the controller that emits
+        k_t, beta_t, g_t, s_t as outputs (see Controller outputs
+        of Figure 2 in paper) along with erase and add vectors
+        """
 	P["W_%d_key"]   = U.initial_weights(input_size,mem_width)
 	P["b_%d_key"]   = 0. * U.initial_weights(mem_width)
 	P["W_%d_shift"] = U.initial_weights(input_size,shift_width)
@@ -21,8 +27,20 @@ def build(P,input_size,mem_width,mem_size,shift_width):
 
 
 	def head_params(x):
+                """
+                Takes hidden layer from controller computes
+                k_t, beta_t, g_t, s_t, and erase and add
+                vectors as outputs
+                """
 		# key
 		key_t = T.dot(x,P["W_%d_key"]) + P["b_%d_key"]
+
+                # key strength
+		_beta_t  = T.dot(x,P["W_%d_beta"])  + P["b_%d_beta"]
+		beta_t  = T.nnet.softplus(_beta_t)
+
+                # interpolation gate
+		g_t     = T.nnet.sigmoid(T.dot(x,P["W_%d_g"]) + P["b_%d_g"])
 
 		# shift
 		shift_t = U.vector_softmax(T.dot(x,P["W_%d_shift"]) + P["b_%d_shift"])
@@ -31,11 +49,10 @@ def build(P,input_size,mem_width,mem_size,shift_width):
 		# scalars
 		_beta_t  = T.dot(x,P["W_%d_beta"])  + P["b_%d_beta"]
 		beta_t  = T.nnet.softplus(_beta_t)
-#		beta_t  = (_beta_t  > 0)*_beta_t
-#		beta_t  = T.exp(_beta_t)
 
 		g_t     = T.nnet.sigmoid(T.dot(x,P["W_%d_g"]) + P["b_%d_g"])
 
+                # erase and add vectors
 		erase_t = T.nnet.sigmoid(T.dot(x,P["W_%d_erase"]) + P["b_%d_erase"])
 		add_t   = T.dot(x,P["W_%d_add"]) + P["b_%d_add"]
 
