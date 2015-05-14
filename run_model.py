@@ -17,12 +17,19 @@ def make_model(
 		mem_size=128,
 		mem_width=20,
 		hidden_size=100):
+	"""
+	Given the model parameters, return a Theano function for the NTM's model
+	"""
+
 	P = Parameters()
+
+	# Build the controller and the read/write head
 	ctrl = controller.build(P,input_size,output_size,mem_size,mem_width,hidden_size)
 	predict = model.build(P,mem_size,mem_width,hidden_size,ctrl)
 	input_seq = T.matrix('input_sequence')
 	[M_curr,weights,output] = predict(input_seq)
 
+	# Return a Theano function for the NTM
 	test_fun = theano.function(
 			inputs=[input_seq],
 			outputs=[weights,output]

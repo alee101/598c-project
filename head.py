@@ -21,16 +21,15 @@ def build(P,input_size,mem_width,mem_size,shift_width):
 	def head_params(x):
 		# shift
 		shift_t = U.vector_softmax(T.dot(x,P["W_%d_shift"]) + P["b_%d_shift"])
-		shift_t.name = "shift_t"
-
-		# scalars
-		_gamma_t = T.dot(x,P["W_%d_gamma"]) + P["b_%d_gamma"]
-		gamma_t = T.nnet.softplus(_gamma_t) + 1.
-#		gamma_t = (_gamma_t > 0)*_gamma_t + 1.
-#		gamma_t = T.exp(_gamma_t) + 1.
+		shift_t.name = "shift_t"	
 
 		g_t     = T.nnet.sigmoid(T.dot(x,P["W_%d_g"]) + P["b_%d_g"])
+                
+		# sharpening
+		_gamma_t = T.dot(x,P["W_%d_gamma"]) + P["b_%d_gamma"]
+		gamma_t = T.nnet.softplus(_gamma_t) + 1.
 
+                # erase and add vectors
 		erase_t = T.nnet.sigmoid(T.dot(x,P["W_%d_erase"]) + P["b_%d_erase"])
 		add_t   = T.dot(x,P["W_%d_add"]) + P["b_%d_add"]
 
