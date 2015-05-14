@@ -24,14 +24,9 @@ def make_model(
 	P = Parameters()
 
 	# Build the controller and the read/write head
-	ctrl = controller.build(P,input_size,output_size,mem_size,mem_width,hidden_size)
-	predict = model.build(P,mem_size,mem_width,hidden_size,ctrl)
-	input_seq = T.matrix('input_sequence')
-	[M_curr,weights,output] = predict(input_seq)
+        # FILL IN HERE
 
 	# Return a Theano function for the NTM
-	test_fun = theano.function(
-			inputs=[input_seq],
-			outputs=[weights,output]
-		)
+        # FILL IN HERE
+
 	return P,test_fun
