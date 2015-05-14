@@ -7,7 +7,7 @@ def build(P,input_size,mem_width,mem_size,shift_width):
         """
         NTM heads are implemented as another hidden layer coming after
         the last hidden layer of the controller that emits
-        k_t, beta_t, g_t, s_t as outputs (see Controller outputs
+        k_t, beta_t, g_t, s_t, gamma_t as outputs (see Controller outputs
         of Figure 2 in paper) along with erase and add vectors
         """
 	P["W_key"]   = U.initial_weights(input_size,mem_width)
@@ -21,6 +21,9 @@ def build(P,input_size,mem_width,mem_size,shift_width):
 
 	P["W_shift"] = U.initial_weights(input_size,shift_width)
 	P["b_shift"] = 0. * U.initial_weights(shift_width)
+
+        P["W_gamma"] = U.initial_weights(input_size)
+-	P["b_gamma"] = 0.
 
 	P["W_erase"] = U.initial_weights(input_size,mem_width)
 	P["b_erase"] = 0. * U.initial_weights(mem_width)
@@ -49,9 +52,13 @@ def build(P,input_size,mem_width,mem_size,shift_width):
 		shift_t = U.vector_softmax(T.dot(x,P["W_shift"]) + P["b_shift"])
 		shift_t.name = "shift_t"
 
+                # sharpening
+                _gamma_t = T.dot(x,P["W_gamma"]) + P["b_gamma"]
+		gamma_t = T.nnet.softplus(_gamma_t) + 1.
+
                 # erase and add vectors
 		erase_t = T.nnet.sigmoid(T.dot(x,P["W_erase"]) + P["b_erase"])
 		add_t   = T.dot(x,P["W_add"]) + P["b_add"]
 
-		return key_t,beta_t,g_t,shift_t,erase_t,add_t
+		return key_t,beta_t,g_t,shift_t,gamma_t,erase_t,add_t
 	return head_params
