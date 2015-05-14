@@ -58,10 +58,10 @@ def build_step(P,controller,controller_size,mem_size,mem_width,similarity=cosine
                 # this is passing the hidden layer into head_params of head.py
 		g,shift,gamma,erase,add = head(input_curr)
 
-                weight_c = np.zeros((mem_width,))
+                weight_c = np.zeros((mem_size,))
                 weight_c[0] = 1
-                weight_c = T.as_tensor_variable(weight_c)
-                #weight_c = theano.shared(weight_c)
+                #weight_c = T.as_tensor_variable(weight_c)
+                weight_c = theano.shared(weight_c)
 		weight_c.name = "weight_c"
 
 		# 3.3.2 Focusing by Location
