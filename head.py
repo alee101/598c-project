@@ -10,20 +10,23 @@ def build(P,input_size,mem_width,mem_size,shift_width):
         k_t, beta_t, g_t, s_t as outputs (see Controller outputs
         of Figure 2 in paper) along with erase and add vectors
         """
-	P["W_%d_key"]   = U.initial_weights(input_size,mem_width)
-	P["b_%d_key"]   = 0. * U.initial_weights(mem_width)
-	P["W_%d_shift"] = U.initial_weights(input_size,shift_width)
-	P["b_%d_shift"] = 0. * U.initial_weights(shift_width)
+	P["W_key"]   = U.initial_weights(input_size,mem_width)
+	P["b_key"]   = 0. * U.initial_weights(mem_width)
 
-	P["W_%d_beta"]  = 0. * U.initial_weights(input_size)
-	P["b_%d_beta"]  = 0.
-	P["W_%d_g"]     = U.initial_weights(input_size)
-	P["b_%d_g"]     = 0.
+	P["W_beta"]  = 0. * U.initial_weights(input_size)
+	P["b_beta"]  = 0.
 
-	P["W_%d_erase"] = U.initial_weights(input_size,mem_width)
-	P["b_%d_erase"] = 0. * U.initial_weights(mem_width)
-	P["W_%d_add"]   = U.initial_weights(input_size,mem_width)
-	P["b_%d_add"]   = 0. * U.initial_weights(mem_width)
+	P["W_g"]     = U.initial_weights(input_size)
+	P["b_g"]     = 0.
+
+	P["W_shift"] = U.initial_weights(input_size,shift_width)
+	P["b_shift"] = 0. * U.initial_weights(shift_width)
+
+	P["W_erase"] = U.initial_weights(input_size,mem_width)
+	P["b_erase"] = 0. * U.initial_weights(mem_width)
+
+	P["W_add"]   = U.initial_weights(input_size,mem_width)
+	P["b_add"]   = 0. * U.initial_weights(mem_width)
 
 
 	def head_params(x):
@@ -33,28 +36,22 @@ def build(P,input_size,mem_width,mem_size,shift_width):
                 vectors as outputs
                 """
 		# key
-		key_t = T.dot(x,P["W_%d_key"]) + P["b_%d_key"]
+		key_t = T.dot(x,P["W_key"]) + P["b_key"]
 
                 # key strength
-		_beta_t  = T.dot(x,P["W_%d_beta"])  + P["b_%d_beta"]
+		_beta_t  = T.dot(x,P["W_beta"])  + P["b_beta"]
 		beta_t  = T.nnet.softplus(_beta_t)
 
                 # interpolation gate
-		g_t     = T.nnet.sigmoid(T.dot(x,P["W_%d_g"]) + P["b_%d_g"])
+		g_t     = T.nnet.sigmoid(T.dot(x,P["W_g"]) + P["b_g"])
 
 		# shift
-		shift_t = U.vector_softmax(T.dot(x,P["W_%d_shift"]) + P["b_%d_shift"])
+		shift_t = U.vector_softmax(T.dot(x,P["W_shift"]) + P["b_shift"])
 		shift_t.name = "shift_t"
 
-		# scalars
-		_beta_t  = T.dot(x,P["W_%d_beta"])  + P["b_%d_beta"]
-		beta_t  = T.nnet.softplus(_beta_t)
-
-		g_t     = T.nnet.sigmoid(T.dot(x,P["W_%d_g"]) + P["b_%d_g"])
-
                 # erase and add vectors
-		erase_t = T.nnet.sigmoid(T.dot(x,P["W_%d_erase"]) + P["b_%d_erase"])
-		add_t   = T.dot(x,P["W_%d_add"]) + P["b_%d_add"]
+		erase_t = T.nnet.sigmoid(T.dot(x,P["W_erase"]) + P["b_erase"])
+		add_t   = T.dot(x,P["W_add"]) + P["b_add"]
 
 		return key_t,beta_t,g_t,shift_t,erase_t,add_t
 	return head_params
