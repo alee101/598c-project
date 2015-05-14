@@ -33,7 +33,7 @@ def error_rate(expected_output, actual_output):
 
 
 if __name__ == "__main__":
-    if sys.argc != 3:
+    if len(sys.argv) != 3:
         print "Usage: python test.py <model_filename> <sequence_length>"
         sys.exit()
 
