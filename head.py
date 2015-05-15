@@ -23,7 +23,7 @@ def build(P,input_size,mem_width,mem_size,shift_width):
 	P["b_shift"] = 0. * U.initial_weights(shift_width)
 
         P["W_gamma"] = U.initial_weights(input_size)
--	P["b_gamma"] = 0.
+	P["b_gamma"] = 0.
 
 	P["W_erase"] = U.initial_weights(input_size,mem_width)
 	P["b_erase"] = 0. * U.initial_weights(mem_width)
