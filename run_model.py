@@ -23,7 +23,7 @@ def make_model(
 
 	P = Parameters()
 
-	# Build the controller and the read/write head
+	# Build the controller
 	ctrl = controller.build(P,input_size,output_size,mem_size,mem_width,hidden_size)
 	predict = model.build(P,mem_size,mem_width,hidden_size,ctrl)
 	input_seq = T.matrix('input_sequence')
