@@ -23,7 +23,7 @@ def make_model(
 
 	P = Parameters()
 
-	# Build the controller and the read/write head
+	# Build the controller and model for prediction
         # FILL IN HERE
 
 	# Return a Theano function for the NTM
